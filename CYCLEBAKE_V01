@@ -1,0 +1,64 @@
+//Cycle Bake V.01 For Maya 
+//Written By Alex Smith 5.31.2021 
+
+//Getting selection and timeslider values
+string $sel[] = `ls -sl`;
+float $minTime = `playbackOptions -q -minTime` ;
+float $maxTime = `playbackOptions -q -maxTime` ;
+
+//smart and sparce bake with messy keys but doesn't key every frame
+bakeResults -simulation true -t ($minTime + ":" + $maxTime) -smart 1 -disableImplicitControl true -preserveOutsideKeys true -sparseAnimCurveBake true -removeBakedAttributeFromLayer false -removeBakedAnimFromLayer false -bakeOnOverrideLayer false -minimizeRotation true -controlPoints false -shape true $sel;
+
+//getting all attributes for all controls individually for cleanup 
+for ($c in $sel) {
+	string $attrs[] = `listAttr -k $c`;
+	for ($singleattribute in $attrs){
+		float $framesnumber[] = `keyframe -q -timeChange ($c + "." + $singleattribute)`;
+		float $eachframe;
+		for ($eachframe in $framesnumber){
+    		float $roundedframe = `ceil $eachframe`;
+    		if ($roundedframe != $eachframe){
+				select -r $c;
+    		    float $uptime = `ceil ($eachframe + 1)`;
+    		    float $downtime = `ceil ($eachframe - 1)`;
+    		    currentTime $uptime;
+    		    setKeyframe;
+    		    currentTime $downtime;
+    		    setKeyframe;
+    		    currentTime $eachframe;
+    		    timeSliderClearKey;
+				selectKey -cl;
+				selectKey -add -keyframe -time $eachframe;
+				cutKey -animation keys -clear ;
+    		}
+		}
+	}
+}
+
+//cleaning up the animation for looping
+//setting the first and last frame to be the same
+select -r $sel;
+currentTime $minTime ;
+timeSliderCopyKey;
+currentTime $maxTime ;
+timeSliderPasteKey false;
+
+//getting rid of keyframes outside of the loop using the min max time of Timeline
+for ($c in $sel) {
+	string $attrs[] = `listAttr -k $c`;
+	for ($singleattribute in $attrs){
+		float $framesnumber[] = `keyframe -q -timeChange ($c + "." + $singleattribute)`;
+		float $eachframe;
+		selectKey -cl;
+		for ($eachframe in $framesnumber){
+    		if ($eachframe < $minTime){
+				selectKey -add -keyframe -time $eachframe;
+				cutKey -clear ;
+    		}
+    		if ($eachframe > $maxTime){
+				selectKey -add -keyframe -time $eachframe;
+				cutKey -animation keys -clear ;
+    		}
+		}
+	}
+}
