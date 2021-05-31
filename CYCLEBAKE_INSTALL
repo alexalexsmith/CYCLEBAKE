@@ -1,0 +1,30 @@
+string $gShelfTopLevel;
+if (`tabLayout -exists $gShelfTopLevel`)
+{
+	shelfButton
+	-parent ($gShelfTopLevel + "|" + `tabLayout -q -st $gShelfTopLevel`)
+	-label "CycleBake"
+	-iol "CBAKE"
+	-command "CycleBake()"
+	-image1 "cycle.png"
+	-annotation "Bake animation cycle";
+	
+	shelfButton
+	-parent ($gShelfTopLevel + "|" + `tabLayout -q -st $gShelfTopLevel`)
+	-label "Curve"
+	-iol "Curve"
+	-command "setInfinity -pri cycle;setInfinity -poi cycle;"
+	-image1 "infinity.png"
+	-annotation "Set Visible Anim Curves to Cycle";
+	
+	shelfButton
+	-parent ($gShelfTopLevel + "|" + `tabLayout -q -st $gShelfTopLevel`)
+	-label "Curve"
+	-iol "Curve"
+	-command "setInfinity -pri constant;setInfinity -poi constant;"
+	-image1 "constant.png"
+	-annotation "Set Visible Anim Curves to Constant";
+}
+else{
+	error "You need a shelf for this Install to complete!  Show your shelf, man!";
+}
