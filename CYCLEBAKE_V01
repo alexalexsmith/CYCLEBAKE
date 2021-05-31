@@ -1,6 +1,7 @@
 //Cycle Bake V.01 For Maya 
 //Written By Alex Smith 5.31.2021 
-
+//Put this file in your scripts folder and run with CycleBake() mel
+global proc CycleBake(){
 //Getting selection and timeslider values
 string $sel[] = `ls -sl`;
 float $minTime = `playbackOptions -q -minTime` ;
@@ -61,4 +62,5 @@ for ($c in $sel) {
     		}
 		}
 	}
+}
 }
